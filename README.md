@@ -48,9 +48,10 @@ mini-app/
 │   ├── src/
 │
 │── nginx/                  # Nginx configuration
-│   ├── nginx.conf
+│   ├── nginx-loadbalancer.conf
 │
-│── docker-compose.yml      # Docker orchestration
+│── docker-compose.yml      # Docker orchestration (with Load Balancer and Replicas)
+│── docker-compose.no-replica.yml  # Docker configuration (without Load Balancer and Replicas)
 │── README.md               # Documentation
 ```
 
@@ -77,15 +78,23 @@ To test, visit `http://localhost:5173/`, which calls the backend API at `http://
 
 ---
 
-### 2️⃣ **Dockerized Deployment (Production Mode)**
-#### **Build and Run Everything with Docker**
+### 2️⃣ **Dockerized Deployment (Two Modes Available)**
+
+#### **Mode 1: Simple Deployment (Without Load Balancer & Replicas)**
+```sh
+docker-compose -f docker-compose.no-replica.yml up --build
+```
+- Runs **a single instance of the backend**.
+- No Load Balancer (Nginx is only used for serving the frontend).
+- Access the API at `http://localhost/api/hello`.
+
+#### **Mode 2: Production Deployment (With Load Balancer & Replicas)**
 ```sh
 docker-compose up --build
 ```
-The services included:
-- **Backend:** Runs on `http://backend:3000`
-- **Frontend:** Accessible via Nginx on `http://localhost/`
-- **API Proxy:** Frontend calls `http://localhost/api/hello`, which is proxied to `http://backend:3000/api/hello`
+- Runs **three instances of the backend** (`backend1`, `backend2`, `backend3`).
+- Uses **NGINX as a Load Balancer** (accessible at `http://localhost:8080/api/hello`).
+- The frontend remains accessible at `http://localhost/`.
 
 #### **Stopping the Containers**
 ```sh
@@ -121,11 +130,10 @@ This allows the frontend to dynamically switch API endpoints.
 ---
 
 ## 📌 Summary
-| Mode | Command | Notes |
-|------|---------|-------|
-| **Local Development** | `npm run dev` | Runs frontend & backend separately |
-| **Docker Build & Run** | `docker-compose up --build` | Full deployment in containers |
-| **Stop Containers** | `docker-compose down` | Stops and removes all containers |
+| Mode | Command | Backend | Load Balancer |
+|------|---------|---------|---------------|
+| **Simple Deployment** | `docker-compose -f docker-compose.no-replica.yml up --build` | 1 instance | ❌ Disabled |
+| **Production Deployment** | `docker-compose up --build` | 3 instances | ✅ Enabled on `8080` |
 
 This project provides an easy-to-deploy **Vue.js + Nitro + Nginx** fullstack solution. 🚀
 
@@ -133,4 +141,3 @@ This project provides an easy-to-deploy **Vue.js + Nitro + Nginx** fullstack sol
 
 **Author:** Laurent Gauthier  
 **Date:** February 2025
-

@@ -1,19 +1,58 @@
+version: '3.8'
 
 services:
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
+    deploy:
+      replicas: 3  # Run 3 instances of the backend
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
+        reservations:
+          cpus: "0.2"
+          memory: "256M"
+    networks:
+      app-network:
+        aliases:
+          - backend1
+          - backend2
+          - backend3
 
   frontend:
     build:
-      context: .  # Contexte à la racine pour inclure nginx.conf
+      context: .
       dockerfile: frontend/Dockerfile
     ports:
       - "80:80"
     depends_on:
       - backend
+    deploy:
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: "256M"
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./nginx/nginx-loadbalancer.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8080:80"  # Load Balancer exposed on 8080
+    depends_on:
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: "128M"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
