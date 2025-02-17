@@ -1,0 +1,35 @@
+{
+    "dashboard": {
+      "id": null,
+      "uid": "docker-monitoring",
+      "title": "Docker Monitoring (Backends)",
+      "timezone": "browser",
+      "panels": [
+        {
+          "title": "Backend CPU Usage",
+          "type": "timeseries",
+          "targets": [
+            { "expr": "container_cpu_usage_seconds_total{container_label_com_docker_compose_service=~'backend.*'}", "legendFormat": "{{instance}}" }
+          ]
+        },
+        {
+          "title": "Backend Memory Usage",
+          "type": "timeseries",
+          "targets": [
+            { "expr": "container_memory_usage_bytes{container_label_com_docker_compose_service=~'backend.*'}", "legendFormat": "{{instance}}" }
+          ]
+        },
+        {
+          "title": "Backend Network I/O",
+          "type": "timeseries",
+          "targets": [
+            { "expr": "rate(container_network_receive_bytes_total{container_label_com_docker_compose_service=~'backend.*'}[1m])", "legendFormat": "{{instance}} - In" },
+            { "expr": "rate(container_network_transmit_bytes_total{container_label_com_docker_compose_service=~'backend.*'}[1m])", "legendFormat": "{{instance}} - Out" }
+          ]
+        }
+      ],
+      "schemaVersion": 26,
+      "version": 1
+    }
+  }
+  

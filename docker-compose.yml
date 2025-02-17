@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   backend:
@@ -29,30 +28,53 @@ services:
       - "80:80"
     depends_on:
       - backend
-    deploy:
-      resources:
-        limits:
-          cpus: "0.2"
-          memory: "256M"
     networks:
       - app-network
 
-  nginx:
-    image: nginx:alpine
+  prometheus:
+    image: prom/prometheus:latest
     volumes:
-      - ./nginx/nginx-loadbalancer.conf:/etc/nginx/nginx.conf:ro
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
-      - "8080:80"  # Load Balancer exposed on 8080
-    depends_on:
-      - backend
-    deploy:
-      resources:
-        limits:
-          cpus: "0.1"
-          memory: "128M"
+      - "9090:9090"
     networks:
       - app-network
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - app-network
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana_dashboard.json:/etc/grafana/provisioning/dashboards/dashboard.json
+      - ./monitoring/grafana_datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    ports:
+      - "8081:8080"
+    networks:
+      - app-network
+    command:
+      - "--docker_only=true"
+      - "--housekeeping_interval=10s"
+      - "--store_container_labels=true"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro  # 🔥 Ajout du socket Docker
+
 
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  grafana-data:
+    driver: local
