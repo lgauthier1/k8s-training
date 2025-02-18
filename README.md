@@ -12,6 +12,8 @@ This project is a hands-on training to understand how to **dockerize a simple AP
 - **Docker Compose**  
 - **Kubernetes (K8s)** ☸️  
 - **Minikube** (optional for local testing)  
+- **Prometheus + Grafana** for monitoring  
+- **wrk** for load testing  
 
 ## 📖 Setup & Usage  
 
@@ -21,6 +23,7 @@ Ensure you have the following installed:
 - [Docker Compose](https://docs.docker.com/compose/install/)  
 - [Kubernetes CLI (kubectl)](https://kubernetes.io/docs/tasks/tools/install-kubectl/)  
 - [Minikube](https://minikube.sigs.k8s.io/docs/start/) (optional for local Kubernetes testing)  
+- [wrk](https://github.com/wg/wrk) for stress testing  
 
 ### Clone the repository  
 ```bash
@@ -30,7 +33,7 @@ cd k8s-training
 
 ## 🚀 Fullstack Application with Vue.js, Nitro Backend, and Nginx
 
-This project consists of a **Vue.js frontend**, a **Nitro (H3) backend**, and **Nginx as a reverse proxy**. It supports **local development** and **Dockerized deployment** using `docker-compose`.
+This project consists of a **Vue.js frontend**, a **Nitro (H3) backend**, and **Nginx as a reverse proxy**. It supports **local development**, **Dockerized deployment**, and includes **monitoring & stress testing**.
 
 ## 📁 Project Structure
 ```
@@ -49,6 +52,11 @@ mini-app/
 │
 │── nginx/                  # Nginx configuration
 │   ├── nginx-loadbalancer.conf
+│
+│── monitoring/             # Monitoring setup (Prometheus + Grafana + cAdvisor)
+│   ├── prometheus.yml
+│   ├── grafana/
+│   ├── cadvisor/
 │
 │── docker-compose.yml      # Docker orchestration (with Load Balancer and Replicas)
 │── docker-compose.no-replica.yml  # Docker configuration (without Load Balancer and Replicas)
@@ -103,39 +111,57 @@ docker-compose down
 
 ---
 
-## 📝 Environment Variables
-### **Frontend (`.env` files)**
-- **Local Development (`frontend/.env`)**:
-  ```env
-  VITE_API_URL=http://localhost:3000
-  ```
-- **Production (`frontend/.env.production`)**:
-  ```env
-  VITE_API_URL=/api
-  ```
+## 📊 Monitoring with Prometheus + Grafana + cAdvisor
+### **Setup and Usage**
+#### **Start Monitoring Stack**
+```sh
+docker-compose up -d prometheus grafana cadvisor
+```
+#### **Access Monitoring Tools**
+- **Prometheus UI:** [http://localhost:9090](http://localhost:9090)
+- **Grafana UI:** [http://localhost:3001](http://localhost:3001) (Default Login: admin/admin)
+- **cAdvisor UI:** [http://localhost:8081](http://localhost:8081)
 
-This allows the frontend to dynamically switch API endpoints.
+#### **Pre-configured Grafana Dashboard**
+- Automatically imported upon startup.
+- Monitors **CPU, Memory, Network, and active containers**.
+- Uses Prometheus as a data source.
 
 ---
 
-## 🔥 Troubleshooting
-### **Common Issues and Fixes**
-| Issue | Solution |
-|--------|-----------|
-| CORS error in frontend | Ensure Nitro allows CORS in `nitro.config.ts` |
-| `server` directive error in Nginx | Check `nginx.conf` format and copy it correctly |
-| Vue.js build fails (TS7016 error) | Add `shims-vue.d.ts` and configure TypeScript |
-| Dockerized frontend not calling backend | Verify `VITE_API_URL` settings |
+## 🏎️ Stress Testing with `wrk`
+To analyze performance and scalability, use `wrk`:
+#### **Basic Load Test**
+```sh
+wrk -t12 -c400 -d30s http://localhost:8080/api/hello
+```
+- `-t12` → 12 threads
+- `-c400` → 400 concurrent connections
+- `-d30s` → Run the test for 30 seconds
+
+#### **Analyze Results**
+Example output:
+```sh
+Running 30s test @ http://localhost:8080/api/hello
+  12 threads and 400 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    48.81ms   40.49ms 295.96ms   83.61%
+    Req/Sec   405.27    358.63     1.59k    76.75%
+  106299 requests in 30.09s, 32.74MB read
+Requests/sec:   3532.36
+Transfer/sec:      1.09MB
+```
+✅ **Use these metrics to optimize scalability and performance!**
 
 ---
 
 ## 📌 Summary
-| Mode | Command | Backend | Load Balancer |
-|------|---------|---------|---------------|
-| **Simple Deployment** | `docker-compose -f docker-compose.no-replica.yml up --build` | 1 instance | ❌ Disabled |
-| **Production Deployment** | `docker-compose up --build` | 3 instances | ✅ Enabled on `8080` |
+| Mode | Command | Backend | Load Balancer | Monitoring |
+|------|---------|---------|---------------|------------|
+| **Simple Deployment** | `docker-compose -f docker-compose.no-replica.yml up --build` | 1 instance | ❌ Disabled | ✅ Enabled |
+| **Production Deployment** | `docker-compose up --build` | 3 instances | ✅ Enabled on `8080` | ✅ Enabled |
 
-This project provides an easy-to-deploy **Vue.js + Nitro + Nginx** fullstack solution. 🚀
+This project provides an easy-to-deploy **Vue.js + Nitro + Nginx** fullstack solution with **Monitoring & Load Testing** 🚀
 
 ---
 
