@@ -53,9 +53,9 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
     volumes:
-      - ./monitoring/dashboards:/var/lib/grafana/dashboards
-      - ./monitoring/dashboards/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml
-      - ./monitoring/datasources:/etc/grafana/provisioning/datasources
+      - ./monitoring/graphana/dashboards:/var/lib/grafana/dashboards
+      - ./monitoring/graphana/dashboards/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml
+      - ./monitoring/graphana/datasources:/etc/grafana/provisioning/datasources
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
