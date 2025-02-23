@@ -59,6 +59,57 @@
           }
         }
       }
+    },
+    {
+      "title": "Backend Request Distribution",
+      "type": "timeseries",
+      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 16 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
+          "expr": "sum(rate(container_network_transmit_bytes_total{container_label_com_docker_compose_service=~'backend.*'}[1m])) by (container_label_com_docker_compose_service, container_label_com_docker_compose_container_number)",
+          "legendFormat": "{{container_label_com_docker_compose_service}}-{{container_label_com_docker_compose_container_number}}",
+          "refId": "C"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": false
+          }
+        }
+      },
+      "options": {
+        "legend": {
+          "calcs": ["lastNotNull"],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "title": "Backend Uptime",
+      "type": "timeseries",
+      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 24 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
+          "expr": "up{job='backend'}",
+          "legendFormat": "{{instance}}",
+          "refId": "D"
+        }
+      ]
     }
   ]
 }
