@@ -55,6 +55,7 @@ services:
     volumes:
       - ./monitoring/dashboards:/var/lib/grafana/dashboards
       - ./monitoring/dashboards/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml
+      - ./monitoring/datasources:/etc/grafana/provisioning/datasources
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest

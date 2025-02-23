@@ -1,25 +1,37 @@
 {
-    "uid": "docker-monitoring",
-    "title": "Docker Monitoring LGA",
-    "description": "Dashboard to monitor Docker containers using Prometheus and cAdvisor.",
-    "schemaVersion": 40,
-    "version": 1,
-    "refresh": "5s",
-    "panels": [
-      {
-        "title": "Backend CPU Usage",
-        "type": "timeseries",
-        "gridPos": { "h": 7, "w": 24, "x": 0, "y": 0 },
-        "targets": [
-          {
-            "expr": "rate(container_cpu_usage_seconds_total{container_label_com_docker_compose_service='backend'}[1m]) * 100",
-            "legendFormat": "{{name}}",
-            "refId": "A"
+  "uid": "docker-monitoring",
+  "title": "Docker Monitoring LGA",
+  "description": "Dashboard to monitor all Docker services using Prometheus and cAdvisor.",
+  "schemaVersion": 40,
+  "version": 1,
+  "refresh": "5s",
+  "panels": [
+    {
+      "title": "CPU Usage - All Services",
+      "type": "timeseries",
+      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
+          "expr": "sum by (container_label_com_docker_compose_service) (rate(container_cpu_usage_seconds_total{container_label_com_docker_compose_service!=\"\"}[1m]) * 100)",
+          "legendFormat": "{{container_label_com_docker_compose_service}}",
+          "step": "5s",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [
+        { "value": 50, "color": "red", "label": "CPU Limit (50%)" },
+        { "value": 80, "color": "orange", "label": "Warning (80%)" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "thresholdsStyle": { "mode": "area" }
           }
-        ],
-        "thresholds": [
-          { "value": 50, "color": "red", "label": "CPU Limit (50%)" }
-        ]
+        }
       }
-    ]
-  }
+    }
+  ]
+}
