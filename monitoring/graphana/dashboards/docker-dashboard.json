@@ -1,0 +1,64 @@
+{
+  "uid": "docker-backend-monitoring",
+  "title": "Backend Monitoring",
+  "description": "Dashboard to monitor CPU and Memory usage of backend instances.",
+  "schemaVersion": 40,
+  "version": 1,
+  "refresh": "5s",
+  "panels": [
+    {
+      "title": "Backend CPU Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
+          "expr": "rate(container_cpu_usage_seconds_total{container_label_com_docker_compose_service=~'backend.*'}[1m]) * 100",
+          "legendFormat": "{{container_label_com_docker_compose_service}}-{{container_label_com_docker_compose_container_number}}",
+          "step": "5s",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [
+        { "value": 50, "color": "red", "label": "CPU Limit (50%)" },
+        { "value": 80, "color": "orange", "label": "Warning (80%)" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "thresholdsStyle": { "mode": "area" }
+          }
+        }
+      }
+    },
+    {
+      "title": "Backend RAM Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "DS_PROMETHEUS" },
+          "expr": "container_memory_usage_bytes{container_label_com_docker_compose_service=~'backend.*'} / 1024 / 1024",
+          "legendFormat": "{{container_label_com_docker_compose_service}}-{{container_label_com_docker_compose_container_number}}",
+          "step": "5s",
+          "refId": "B"
+        }
+      ],
+      "thresholds": [
+        { "value": 512, "color": "red", "label": "Memory Limit (512MB)" },
+        { "value": 400, "color": "orange", "label": "Warning (400MB)" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "mbytes",
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "thresholdsStyle": { "mode": "area" }
+          }
+        }
+      }
+    }
+  ]
+}

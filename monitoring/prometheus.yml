@@ -1,0 +1,17 @@
+global:
+  scrape_interval: 5s  # Récupère les métriques toutes les 5 secondes
+  evaluation_interval: 5s  # Évalue les règles toutes les 5 secondes
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+
+  - job_name: 'backend'
+    static_configs:
+      - targets: ['backend1:3000', 'backend2:3000', 'backend3:3000']
+    metrics_path: "/metrics"  # 🔥 Change l'endpoint ici
