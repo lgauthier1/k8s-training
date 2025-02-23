@@ -1,0 +1,25 @@
+{
+    "uid": "docker-monitoring",
+    "title": "Docker Monitoring LGA",
+    "description": "Dashboard to monitor Docker containers using Prometheus and cAdvisor.",
+    "schemaVersion": 40,
+    "version": 1,
+    "refresh": "5s",
+    "panels": [
+      {
+        "title": "Backend CPU Usage",
+        "type": "timeseries",
+        "gridPos": { "h": 7, "w": 24, "x": 0, "y": 0 },
+        "targets": [
+          {
+            "expr": "rate(container_cpu_usage_seconds_total{container_label_com_docker_compose_service='backend'}[1m]) * 100",
+            "legendFormat": "{{name}}",
+            "refId": "A"
+          }
+        ],
+        "thresholds": [
+          { "value": 50, "color": "red", "label": "CPU Limit (50%)" }
+        ]
+      }
+    ]
+  }

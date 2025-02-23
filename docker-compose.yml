@@ -48,10 +48,13 @@ services:
       - prometheus
     networks:
       - app-network
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
     volumes:
-      - grafana-data:/var/lib/grafana
-      - ./monitoring/grafana_dashboard.json:/etc/grafana/provisioning/dashboards/dashboard.json
-      - ./monitoring/grafana_datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+      - ./monitoring/dashboards:/var/lib/grafana/dashboards
+      - ./monitoring/dashboards/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
