@@ -1,0 +1,18 @@
+replicaCount: 1
+
+image:
+  repository: k8s-training-frontend
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  host: frontend.local
+  path: /
+
+alias:
+  enabled: true
